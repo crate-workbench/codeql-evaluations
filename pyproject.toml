@@ -1,0 +1,6 @@
+[tool.pytest.ini_options]
+
+addopts = "-rA -vvv"
+
+# https://docs.pytest.org/en/7.1.x/example/pythoncollection.html
+python_files = "*.py"

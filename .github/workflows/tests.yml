@@ -1,5 +1,17 @@
 name: Tests
-on: push
+
+on:
+
+  # Trigger when pushing.
+  push:
+
+  # Allow job to be triggered manually.
+  workflow_dispatch:
+
+# Cancel in-progress jobs when pushing to the same branch.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
@@ -23,13 +35,3 @@ jobs:
       - name: Run tests
         run: |
           pytest -vvv
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
-        with:
-          languages: python
-          config-file: ./.github/codeql.yml
-          queries: +security-and-quality
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2

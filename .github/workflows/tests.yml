@@ -17,6 +17,14 @@ jobs:
   test:
 
     runs-on: "ubuntu-latest"
+
+    services:
+
+      cratedb:
+        image: crate:5.1.1
+        ports:
+          - 4200:4200
+
     steps:
 
       - name: Acquire sources
@@ -30,7 +38,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install pytest
+          pip install pytest crate[sqlalchemy]
 
       - name: Run tests
         run: |

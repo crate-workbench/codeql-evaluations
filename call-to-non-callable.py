@@ -5,6 +5,17 @@ Synopsis::
 
     pytest call-to-non-callable.py
 """
+import functools
+
+
+def noargs_command(func):
+    @functools.wraps(func)
+    def wrapper(self, cmd, *args, **kwargs):
+        if len(args):
+            cmd.logger.critical('Command does not take any arguments.')
+            return
+        return func(self, cmd, *args, **kwargs)
+    return wrapper
 
 
 class Command(object):
@@ -13,6 +24,8 @@ class Command(object):
 
 
 class FooBarCommand(Command):
+
+    @noargs_command
     def __call__(self, cmd, *args, **kwargs):
         return f"{cmd}: foobar"
 

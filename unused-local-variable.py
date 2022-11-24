@@ -1,6 +1,9 @@
 """
 Evaluate CodeQL scan false positive with `py/unused-local-variable`.
 
+`DummyTable` is an SQLAlchemy model definition. By its nature,
+it just needs to be defined, and not necessarily *used*.
+
 Synopsis::
 
     pip install pytest crate[sqlalchemy]
@@ -12,10 +15,8 @@ from unittest.mock import MagicMock, patch
 import pytest
 import sqlalchemy as sa
 from crate.client.cursor import Cursor
+from crate.client.sqlalchemy.types import ObjectArray
 from sqlalchemy.orm import declarative_base
-
-pytest.skip(reason="Implementation incomplete", allow_module_level=True)
-
 
 fake_cursor = MagicMock(name="fake_cursor")
 FakeCursor = MagicMock(name="FakeCursor", spec=Cursor)
@@ -35,6 +36,10 @@ def db():
 
 @patch("crate.client.connection.Cursor", FakeCursor)
 def test_table_with_object_array(db):
+    class DummyTable(db.Base):
+        __tablename__ = "t"
+        pk = sa.Column(sa.String, primary_key=True)
+        tags = sa.Column(ObjectArray)
 
     db.Base.metadata.create_all()
     fake_cursor.execute.assert_called_with(
